@@ -566,6 +566,47 @@
     // 페이지 로드 시 확인 + 30초마다 자동 재확인(수업이 끝나면 자동 잠김)
     window.addEventListener('DOMContentLoaded', checkTimeAllowed);
     setInterval(checkTimeAllowed, 30000);
+    // ================================================
+    // 8. 작성 내용 브라우저 자동 임시저장 (탭을 닫아도 유지)
+    // ================================================
+    const STORAGE_KEY = 'ghgeo26_' + location.pathname;
+
+    function saveDraft() {
+      const data = {};
+      document.querySelectorAll('#capture-area input[type="text"], #capture-area textarea').forEach((el, idx) => {
+        const key = el.id || el.name || ('field_' + idx);
+        data[key] = el.value;
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function loadDraft() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) return;
+      try {
+        const data = JSON.parse(saved);
+        document.querySelectorAll('#capture-area input[type="text"], #capture-area textarea').forEach((el, idx) => {
+          const key = el.id || el.name || ('field_' + idx);
+          if (data[key] !== undefined) {
+            el.value = data[key];
+            el.dispatchEvent(new Event('input')); // 글자수 카운터 자동 갱신
+          }
+        });
+      } catch (e) {}
+    }
+
+    // 입력할 때마다 자동 저장 + 페이지 열릴 때 자동 복원
+    document.querySelectorAll('#capture-area input[type="text"], #capture-area textarea').forEach(el => {
+      el.addEventListener('input', saveDraft);
+    });
+    window.addEventListener('DOMContentLoaded', loadDraft);
+
+    // '학습지 초기화' 버튼 클릭 시 임시저장 데이터도 함께 삭제
+    document.querySelectorAll('button').forEach(btn => {
+      if (btn.textContent.includes('초기화')) {
+        btn.addEventListener('click', () => localStorage.removeItem(STORAGE_KEY));
+      }
+    });
 
     </script></body>
 </html>
