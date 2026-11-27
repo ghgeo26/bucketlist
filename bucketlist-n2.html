@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>2026 금호고 여행지리 수행평가</title>
+<!-- 화면 캡처 및 PDF 생성 라이브러리 로드 -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+<style>
+  body {
+    font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+    background-color: #f3f4f6;
+    padding: 20px;
+    margin: 0;
+  }
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  h1 { 
+    text-align: center; 
+    font-size: 26px; 
+    margin-bottom: 30px;
+    color: #111827;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 25px;
+    table-layout: fixed;
+  }
+  th, td {
+    border: 1px solid #d1d5db;
+    padding: 12px;
+    text-align: left;
+    vertical-align: middle;
+    word-wrap: break-word;
+  }
+  th { 
+    background-color: #f9fafb; 
+    font-weight: bold; 
+    text-align: center;
+    width: 20%;
+  }
+  .text-center { text-align: center; }
+  input[type="text"], textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 14px;
+  }
+  /* 텍스트에어리어 자동 늘어나도록 기본 설정 (스크롤 숨김) */
+  textarea { 
+    resize: none; 
+    overflow: hidden; 
+    min-height: 100px; 
+  }
+  .char-count {
+    font-size: 13px;
+    color: #4b5563;
+    text-align: right;
+    margin-top: 6px;
+  }
+  .status-btn {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    margin-top: 8px;
+    background-color: #e5e7eb;
+    color: #6b7280;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    text-align: center;
+    transition: 0.3s;
+  }
+  /* 글자 수를 만족했을 때 녹색 버튼 활성화 */
+  .status-btn.active {
+    background-color: #10b981; 
+    color: white;
+  }
+  .status-btn.over {
+    background-color: #ef4444;
+    color: white;
+  }
+  .radio-group label {
+    margin-right: 15px;
+    cursor: pointer;
+  }
+  
+  
+
+  /* 이미지 복붙 영역 스타일 */
+  .image-paste-area {
+    width: 100%;
+    min-height: 150px;
+    border: 2px dashed #d1d5db;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+    text-align: center;
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+    background-color: #f9fafb;
+    outline: none;
+  }
+  .image-paste-area img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  /* 캡처할 때 textarea를 대체할 숨겨진 div (텍스트 잘림 방지용) */
+  .print-text {
+    display: none;
+    white-space: pre-wrap;
+    word-break: break-all;
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 14px;
+    min-height: 100px;
+    font-family: inherit;
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  .button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .action-btn {
+    flex: 1;
+    padding: 15px;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s;
+  }
+  .reset-btn {
+    background-color: #ef4444;
+  }
+  .reset-btn:hover {
+    background-color: #dc2626;
+  }
+  .download-btn {
+    background-color: #2563eb;
+  }
+  .download-btn:hover {
+    background-color: #1d4ed8;
+  }
+</style>
+</head>
+<body>
+<div id="time-lock-banner" style="display:block; max-width:800px; margin:0 auto 14px; background-color:#fef3c7; color:#92400e; border:2px solid #f59e0b; border-radius:8px; padding:12px 16px; font-weight:bold; text-align:center; font-size:14px; line-height:1.5;">확인 중입니다. 수업 반을 선택해주세요.</div>
+<div class="container" id="capture-area">
+<h1>2026 금호고 여행지리 수행평가<br/>버킷리스트 여행지</h1>
+<table>
+<tr>
+<th>수업교실</th>
+<td colspan="3">
+<div class="radio-group">
+<label><input name="classRoom" type="radio" value="2학년1반"/> 2학년 1반</label>
+<label><input name="classRoom" type="radio" value="2학년3반"/> 2학년 3반</label>
+<label><input name="classRoom" type="radio" value="2학년4반"/> 2학년 4반</label>
+</div>
+</td>
+</tr>
+<tr>
+<th>학번</th>
+<td><input id="studentId" placeholder="예: 20101" type="text" disabled/><div class="print-text input-print-text" style="display:none; padding:10px; border:1px solid #d1d5db; border-radius:4px; font-size:14px; min-height:40px; box-sizing:border-box; word-break:break-all;"></div></td>
+<th>이름</th>
+<td><input id="studentName" placeholder="홍길동" type="text" disabled/><div class="print-text input-print-text" style="display:none; padding:10px; border:1px solid #d1d5db; border-radius:4px; font-size:14px; min-height:40px; box-sizing:border-box; word-break:break-all;"></div></td>
+</tr>
+<tr>
+<td colspan="4" style="background-color:#fef2f2; color:#dc2626; font-weight:bold; text-align:center; padding:10px; border:1px solid #fecaca;">AI를 이용한 정보 검색, 문장 구성을 금지합니다.</td>
+</tr>
+</table>
+<table>
+<tr>
+<th>두 번째 여행지<br/>(국가명, 지역명)</th>
+<td colspan="2"><input class="no-paste" id="destination" placeholder="직접 입력하세요" type="text" disabled/><div class="print-text input-print-text" style="display:none; padding:10px; border:1px solid #d1d5db; border-radius:4px; font-size:14px; min-height:40px; box-sizing:border-box; word-break:break-all;"></div></td>
+</tr>
+<tr>
+<th class="text-center">사진</th>
+<td style="width:40%;">
+<div class="image-paste-area" tabindex="-1" style="pointer-events:none; opacity:0.5;">여기에 이미지를 붙여넣기\n(Ctrl+V) 또는 드래그</div>
+</td>
+<td style="width:40%;">
+<div class="image-paste-area" tabindex="-1" style="pointer-events:none; opacity:0.5;">여기에 이미지를 붙여넣기\n(Ctrl+V) 또는 드래그</div>
+</td>
+</tr>
+<tr>
+<th>선정 이유 및<br/>기대되는 점<br/>(200~250자)</th>
+<td colspan="2">
+<!-- 실제 입력창 -->
+<textarea class="no-paste auto-resize auto-resize" id="reason" placeholder="200~250자로 작성하세요" disabled></textarea><div class="print-text" id="reason-print" style="display:none; padding:10px; border:1px solid #d1d5db; border-radius:4px; font-size:14px; min-height:100px; box-sizing:border-box; white-space:pre-wrap; word-break:break-all;"></div>
+<!-- 캡처 시 보여질 대체 div -->
+<div class="char-count"><span id="reason-count">0</span> / 200~250자</div>
+<div class="status-btn" id="reason-btn">글자수 부족</div>
+</td>
+</tr>
+<tr>
+<th>여행지 정보<br/>(400~500자)</th>
+<td colspan="2">
+<textarea class="no-paste auto-resize auto-resize" id="info" placeholder="400~500자로 작성하세요" disabled></textarea><div class="print-text" id="info-print" style="display:none; padding:10px; border:1px solid #d1d5db; border-radius:4px; font-size:14px; min-height:100px; box-sizing:border-box; white-space:pre-wrap; word-break:break-all;"></div>
+<div class="char-count"><span id="info-count">0</span> / 400~500자</div>
+<div class="status-btn" id="info-btn">글자수 부족</div>
+</td>
+</tr>
+<tr>
+<th>출처<br/>(참고 자료 링크)</th>
+<td colspan="2">
+<textarea class="auto-resize auto-resize" id="source" placeholder="링크를 붙여넣으세요" disabled></textarea><div class="print-text" id="source-print" style="display:none; padding:10px; border:1px solid #d1d5db; border-radius:4px; font-size:14px; min-height:100px; box-sizing:border-box; white-space:pre-wrap; word-break:break-all;"></div>
+</td>
+</tr>
+</table>
+</div>
+<div class="button-group"><button class="action-btn reset-btn" onclick="resetForm()">학습지 초기화</button><button class="action-btn download-btn" onclick="downloadPdf('두번째')" disabled>제출용 PDF 다운로드</button></div>
+
+<script>
+    // 1. 복사/붙여넣기 금지 스크립트 (출처 제외)
+    document.querySelectorAll('.no-paste').forEach(el => {
+      el.addEventListener('paste', e => {
+        e.preventDefault();
+        alert('이 항목은 복사/붙여넣기가 금지되어 있습니다. 직접 타이핑하여 작성해주세요.');
+      });
+      el.addEventListener('drop', e => e.preventDefault());
+    });
+
+    // 2. 글자 수 계산 및 버튼 활성화
+    function updateCharCount(inputId, countId, btnId, min, max) {
+      const input = document.getElementById(inputId);
+      const count = document.getElementById(countId);
+      const btn = document.getElementById(btnId);
+
+      if(!input || !count || !btn) return;
+
+      input.addEventListener('input', () => {
+        const length = input.value.length;
+        count.textContent = length;
+
+        // Auto-resize
+        input.style.height = 'auto';
+        input.style.height = input.scrollHeight + 'px';
+
+        if (length >= min && length <= max) {
+          btn.classList.add('active');
+          btn.classList.remove('over');
+          btn.textContent = '[글자수 충족]';
+        } else if (length < min) {
+          btn.classList.remove('active');
+          btn.classList.remove('over');
+          btn.textContent = '[글자수 부족]';
+        } else {
+          btn.classList.remove('active');
+          btn.classList.add('over');
+          btn.textContent = '[글자수 초과]';
+        }
+      });
+    }
+
+    updateCharCount('reason', 'reason-count', 'reason-btn', 200, 250);
+    updateCharCount('info', 'info-count', 'info-btn', 400, 500);
+
+    // 3. 이미지 붙여넣기 및 드래그 앤 드롭
+    document.querySelectorAll('.image-paste-area').forEach(area => {
+      area.addEventListener('click', () => area.focus());
+
+      const handleImage = (file) => {
+        if (file && file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = e => {
+            area.innerHTML = `<img src="${e.target.result}" style="max-width:100%; max-height:100%; object-fit:contain;" />`;
+            saveToLocal();
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+
+      area.addEventListener('paste', e => {
+        e.preventDefault();
+        const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+        for (let index in items) {
+          const item = items[index];
+          if (item.kind === 'file') {
+            handleImage(item.getAsFile());
+            break;
+          }
+        }
+      });
+
+      area.addEventListener('dragover', e => {
+        e.preventDefault();
+        area.style.backgroundColor = '#e5e7eb';
+      });
+
+      area.addEventListener('dragleave', e => {
+        e.preventDefault();
+        area.style.backgroundColor = '#f9fafb';
+      });
+
+      area.addEventListener('drop', e => {
+        e.preventDefault();
+        area.style.backgroundColor = '#f9fafb';
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+          handleImage(e.dataTransfer.files[0]);
+        }
+      });
+    });
+
+    // 4. 로컬 스토리지 임시 저장
+    const STORAGE_KEY = 'bucketlist_' + '두번째'; 
+
+    function saveToLocal() {
+      const data = {};
+      document.querySelectorAll('input[type="text"], textarea').forEach((el, index) => {
+        if(el.id) data[el.id] = el.value;
+        else data['input_' + index] = el.value;
+      });
+
+      const selectedRadio = document.querySelector('input[name="classRoom"]:checked');
+      if (selectedRadio) data['classRoom'] = selectedRadio.value;
+
+      const images = [];
+      document.querySelectorAll('.image-paste-area').forEach(area => {
+        const img = area.querySelector('img');
+        images.push(img ? img.src : null);
+      });
+      data['images'] = images;
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function loadFromLocal() {
+      const dataStr = localStorage.getItem(STORAGE_KEY);
+      if (!dataStr) return;
+      try {
+        const data = JSON.parse(dataStr);
+        document.querySelectorAll('input[type="text"], textarea').forEach((el, index) => {
+          const val = el.id ? data[el.id] : data['input_' + index];
+          if(val !== undefined) el.value = val;
+          if(el.tagName === 'TEXTAREA') {
+            el.dispatchEvent(new Event('input'));
+          }
+        });
+        if (data['classRoom']) {
+          const radio = document.querySelector(`input[name="classRoom"][value="${data['classRoom']}"]`);
+          if (radio) radio.checked = true;
+        }
+        if (data['images']) {
+          document.querySelectorAll('.image-paste-area').forEach((area, i) => {
+            if (data['images'][i]) {
+              area.innerHTML = `<img src="${data['images'][i]}" style="max-width:100%; max-height:100%; object-fit:contain;" />`;
+            }
+          });
+        }
+      } catch(e) {}
+    }
+
+    document.querySelectorAll('input, textarea').forEach(el => {
+      el.addEventListener('input', saveToLocal);
+      el.addEventListener('change', saveToLocal);
+    });
+
+    window.addEventListener('DOMContentLoaded', loadFromLocal);
+
+    // 5. 초기화 기능
+    function resetForm() {
+      if (confirm('정말로 학습지를 초기화하시겠습니까? 모든 내용이 삭제됩니다.')) {
+        localStorage.removeItem(STORAGE_KEY);
+        location.reload();
+      }
+    }
+
+    // URL to Link conversion
+    function linkify(text) {
+      const urlRegex = /(https?:\/\/[^\s<]+)/g;
+      return text.replace(urlRegex, function(url) {
+        return '<a href="' + url + '" target="_blank" style="color:#2563eb; text-decoration:underline;">' + url + '</a>';
+      });
+    }
+
+    // 6. PDF 다운로드 기능 (제출용)
+    function downloadPdf(nth) {
+      const radio = document.querySelector('input[name="classRoom"]:checked');
+      const className = radio ? radio.value.replace(/\s/g, '') : '교실미상';
+      const studentId = document.getElementById('studentId') ? document.getElementById('studentId').value.trim() : '';
+      const finalStudentId = studentId || '학번미상';
+
+      const today = new Date();
+      const dateStr = String(today.getFullYear()).slice(2) +
+                      String(today.getMonth() + 1).padStart(2, '0') +
+                      String(today.getDate()).padStart(2, '0');
+
+      const filename = `${className}_${finalStudentId}_${nth}여행지_${dateStr}.pdf`;
+
+      // 입력창을 읽기 전용 텍스트 뷰로 전환 (텍스트 잘림 방지)
+      document.querySelectorAll('input[type="text"]').forEach(inputEl => {
+        const printDiv = inputEl.nextElementSibling;
+        if (printDiv && printDiv.classList.contains('input-print-text')) {
+          printDiv.textContent = inputEl.value;
+          inputEl.style.display = 'none';
+          printDiv.style.display = 'block';
+        }
+      });
+
+      document.querySelectorAll('.auto-resize').forEach(textarea => {
+        const printDiv = textarea.nextElementSibling;
+        if (printDiv && printDiv.classList.contains('print-text')) {
+          if (textarea.id === 'source') {
+            printDiv.innerHTML = linkify(textarea.value).replace(/\n/g, '<br>');
+          } else {
+            printDiv.innerHTML = textarea.value.replace(/\n/g, '<br>');
+          }
+          textarea.style.display = 'none';
+          printDiv.style.display = 'block';
+        }
+      });
+
+      const btnGroup = document.querySelector('.button-group');
+      if (btnGroup) btnGroup.style.display = 'none';
+
+      window.scrollTo(0, 0);
+
+      // 화면을 캡처한 뒤 jsPDF로 여러 페이지에 걸쳐 나눠 담기
+      html2canvas(document.getElementById('capture-area'), { scale: 2, backgroundColor: '#ffffff', scrollY: 0 }).then(canvas => {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+
+        const imgWidth = pageWidth;
+        const imgHeight = canvas.height * imgWidth / canvas.width;
+        const imgData = canvas.toDataURL('image/png');
+
+        let heightLeft = imgHeight;
+        let position = 0;
+
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+
+        while (heightLeft > 0) {
+          position = heightLeft - imgHeight;
+          pdf.addPage();
+          pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+        }
+
+        pdf.save(filename);
+
+        // 캡처가 끝나면 원래 입력 화면으로 복원
+        document.querySelectorAll('input[type="text"]').forEach(inputEl => {
+          const printDiv = inputEl.nextElementSibling;
+          if (printDiv && printDiv.classList.contains('input-print-text')) {
+            inputEl.style.display = 'block';
+            printDiv.style.display = 'none';
+          }
+        });
+
+        document.querySelectorAll('.auto-resize').forEach(textarea => {
+          const printDiv = textarea.nextElementSibling;
+          if (printDiv && printDiv.classList.contains('print-text')) {
+            textarea.style.display = 'block';
+            printDiv.style.display = 'none';
+          }
+        });
+
+        if (btnGroup) btnGroup.style.display = 'flex';
+      });
+    }
+    
+
+    // ================================================
+    // 7. 수업 시간 제한 기능 (Apps Script 서버 시간 기준)
+    // ================================================
+    // 아래 URL을 Apps Script "웹 앱으로 배포" 후 발급받은 URL로 바꿔주세요.
+    // 예: https://script.google.com/macros/s/AKfycbxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/exec
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1azmsSIAvyfioOxzw1uGoSmnbqLOFkJhVLHT9iJAiqcAY1lYAShbLwsL2IXRKam7svw/exec";
+
+    // 잠글/풀 대상: 반 선택(radio)은 제외하고 나머지 입력요소만 대상으로 함
+    const LOCK_TARGETS_SELECTOR = '#capture-area input[type="text"], #capture-area textarea';
+
+    function setFormEnabled(enabled) {
+      document.querySelectorAll(LOCK_TARGETS_SELECTOR).forEach(el => {
+        el.disabled = !enabled;
+        el.style.opacity = enabled ? '1' : '0.5';
+      });
+
+      document.querySelectorAll('.image-paste-area').forEach(area => {
+        area.style.pointerEvents = enabled ? 'auto' : 'none';
+        area.style.opacity = enabled ? '1' : '0.5';
+        area.setAttribute('tabindex', enabled ? '0' : '-1');
+      });
+
+      const downloadBtn = document.querySelector('.download-btn');
+      if (downloadBtn) downloadBtn.disabled = !enabled;
+
+      if (!enabled && document.activeElement && document.activeElement.blur) {
+        document.activeElement.blur();
+      }
+    }
+
+    function setLockBanner(show, message) {
+      const banner = document.getElementById('time-lock-banner');
+      if (!banner) return;
+      if (show) {
+        banner.textContent = '⏳ ' + message;
+        banner.style.display = 'block';
+      } else {
+        banner.style.display = 'none';
+      }
+    }
+
+    async function checkTimeAllowed() {
+      const radio = document.querySelector('input[name="classRoom"]:checked');
+      if (!radio) {
+        setFormEnabled(false);
+        setLockBanner(true, '수업 반을 먼저 선택해주세요.');
+        return;
+      }
+      try {
+        const res = await fetch(APPS_SCRIPT_URL + '?class=' + encodeURIComponent(radio.value) + '&t=' + Date.now());
+        const data = await res.json();
+        if (data.allowed) {
+          setFormEnabled(true);
+          setLockBanner(false);
+        } else {
+          setFormEnabled(false);
+          setLockBanner(true, (data.reason || '지금은 입력 가능한 수업 시간이 아닙니다.') + ' (서버 시간 ' + data.serverTime + ')');
+        }
+      } catch (err) {
+        setFormEnabled(false);
+        setLockBanner(true, '시간 확인에 실패했습니다. 인터넷 연결을 확인해주세요. (잠시 후 자동 재시도)');
+      }
+    }
+
+    // 초기 상태: 항상 잠금
+    setFormEnabled(false);
+
+    // 반 선택 시 즉시 확인
+    document.querySelectorAll('input[name="classRoom"]').forEach(radio => {
+      radio.addEventListener('change', checkTimeAllowed);
+    });
+
+    // 페이지 로드 시 확인 + 30초마다 자동 재확인(수업이 끝나면 자동 잠김)
+    window.addEventListener('DOMContentLoaded', checkTimeAllowed);
+    setInterval(checkTimeAllowed, 30000);
+
+    </script></body>
+</html>
